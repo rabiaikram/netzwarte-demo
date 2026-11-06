@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Netzwarte – District Heating Digital Shadow</title>
+<style>
+:root{--bg:#f3f5f8;--card:#fff;--ink:#101c2e;--mute:#5d6c82;--line:#dfe5ee;--c1:#0a63c9;--c2:#8795a9;--ok:#178a56;--warn:#c47f00;--crit:#cf2f3a;--okb:#e3f4ec;--warnb:#fbf0d9;--critb:#fbe4e6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root:not([data-theme="light"]){color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0a111d;--card:#111b2d;--ink:#e5ecf6;--mute:#8d9fb8;--line:#212f48;--c1:#58a8ff;--c2:#7f90a8;--ok:#3fc287;--warn:#e8a93a;--crit:#ff6b73;--okb:#10301f;--warnb:#352a0e;--critb:#3a1519}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0a111d;--card:#111b2d;--ink:#e5ecf6;--mute:#8d9fb8;--line:#212f48;--c1:#58a8ff;--c2:#7f90a8;--ok:#3fc287;--warn:#e8a93a;--crit:#ff6b73;--okb:#10301f;--warnb:#352a0e;--critb:#3a1519}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "IBM Plex Sans","Segoe UI",system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 40px}
+h1{font:600 21px/1.2 "IBM Plex Sans","Segoe UI",sans-serif;margin:0;letter-spacing:-.01em}
+h2{font-size:14px;margin:0 0 10px;font-weight:600}
+.sub{color:var(--mute);font-size:12.5px;margin-top:3px}
+.top{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.bar{display:flex;gap:12px;align-items:center;flex:1 1 340px;max-width:560px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.bar input{flex:1;accent-color:var(--c1)}
+.bar b{min-width:92px;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:7px;padding:5px 11px}
+button:focus-visible,tr:focus-visible,g:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
+button.on{background:var(--c1);border-color:var(--c1);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+.k span{color:var(--mute);font-size:12px}.k strong{display:block;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}.k small{color:var(--mute);font-size:12px}
+.g2{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:860px){.g2{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+svg{width:100%;height:auto;display:block}
+.gl{stroke:var(--line);stroke-width:1}.ax{fill:var(--mute);font-size:10px}.cur{stroke:var(--ink);stroke-width:1;stroke-dasharray:2 3;opacity:.6}
+.pipe{stroke:var(--s);stroke-linecap:round;fill:none}
+.flow{stroke:var(--card);stroke-width:2;stroke-dasharray:3 9;animation:fl 1.2s linear infinite;fill:none}
+@keyframes fl{to{stroke-dashoffset:-12}}
+@media(prefers-reduced-motion:reduce){.flow{animation:none}}
+.s-ok{--s:var(--ok)}.s-warn{--s:var(--warn)}.s-crit{--s:var(--crit)}
+.nd{fill:var(--card);stroke:var(--s);stroke-width:2}.nt{fill:var(--ink);font-size:11px;font-weight:600}.nv{fill:var(--mute);font-size:10px}
+g.a{cursor:pointer}g.sel .nd{stroke-width:3.5}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--mute);font-weight:500;font-size:12px;padding:4px 6px;border-bottom:1px solid var(--line)}
+td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.r{cursor:pointer}tr.r:hover{background:var(--bg)}tr.sel{background:var(--bg)}
+.pill{display:inline-block;border-radius:99px;padding:1px 9px;font-size:12px;font-weight:600}
+.pill.crit{background:var(--critb);color:var(--crit)}.pill.warn{background:var(--warnb);color:var(--warn)}.pill.ok{background:var(--okb);color:var(--ok)}
+.tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.lg{display:flex;gap:14px;color:var(--mute);font-size:12px;margin:2px 0 4px}.lg i{display:inline-block;width:18px;height:0;border-top:2px solid var(--c1);vertical-align:middle;margin-right:5px}.lg i.d{border-top:2px dashed var(--c2)}
+.pipeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.st{border:1px solid var(--line);border-radius:8px;padding:8px 10px}.st b{display:block;font-size:12.5px}.st span{color:var(--mute);font-size:12px}
+.eq{font:12px/1.7 ui-monospace,Menlo,Consolas,monospace;color:var(--ink);margin:0;white-space:pre-wrap}
+.foot{color:var(--mute);font-size:12px;margin-top:6px}
+.res{margin-top:6px}
+</style></head><body><div class="wrap">
+<div class="top"><div><h1>Netzwarte · District heating digital shadow</h1>
+<div class="sub">Thermo-hydraulic model vs. operational time series, with automated diagnostics. Demo network, synthetic data.</div></div>
+<div class="bar"><button id="pl" onclick="play()">Replay</button><input id="sl" type="range" min="0" max="71" value="71" aria-label="Time step" oninput="setT(+this.value)"><b id="tl"></b></div></div>
+<div id="app"></div>
+<div class="foot">Independent open model built from standard physics (heat-loss, transport-delay, Darcy–Weisbach). Synthetic data with injected faults; no third-party research code or data is used.</div>
+</div>
+<script>
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R=rng(11),g=()=>Math.sqrt(-2*Math.log(R()+1e-9))*Math.cos(6.2832*R());
+const N=72,cp=4.18,rho=977,Tg=8,T=[...Array(N).keys()];
+const ramp=(t,t0,d)=>Math.min(1,Math.max(0,(t-t0)/d));
+const To=T.map(t=>1+5*Math.sin(6.2832*(t%24-9)/24)),Ts=To.map(x=>62+(10-x)*1.1);
+const C={},P={};
+[['C1',900],['C2',700],['C3',1100],['C4',800],['C5',600]].forEach(([id,Qd])=>C[id]={id,Qd});
+[['P1',700,.2,.22,['P2','P3','C5']],['P2',500,.15,.2,['C1','C2']],['P3',600,.15,.2,['C3','C4']]].forEach(([id,L,D,k,kids])=>P[id]={id,L,D,k,kids});
+const st={n:0,miss:0,spk:0,fix:0};
+const raw=a=>a.map(v=>{st.n++;const r=R();if(r<.015){st.miss++;return NaN}if(r<.022){st.spk++;return v*1.8}return v});
+const clean=a=>a.map((v,i)=>{const w=a.slice(Math.max(0,i-3),i+4).filter(x=>!isNaN(x)).sort((x,y)=>x-y),m=w[w.length>>1];if(isNaN(v)||Math.abs(v-m)>.35*Math.abs(m)){st.fix++;return m}return v});
+Object.values(C).forEach(c=>{
+ c.Q=T.map(t=>c.Qd*(18-To[t])/22*(.75+.25*Math.sin(6.2832*(t%24-4)/24)));
+ c.TrM=c.Q.map(q=>38+6*q/c.Qd);
+ c.mM=T.map(t=>c.Q[t]/(cp*(Ts[t]-c.TrM[t])));
+ c.TrR=clean(raw(c.TrM.map((v,t)=>v+.4*g()+(c.id=='C4'?9*ramp(t,40,6):0))));
+ let m=c.mM.map(v=>v*(1+.02*g()));if(c.id=='C3'){const f=m[50];for(let t=50;t<N;t++)m[t]=f}
+ c.mR=clean(raw(m));});
+const mf=(id,t)=>id[0]=='C'?C[id].mM[t]:P[id].kids.reduce((s,k)=>s+mf(k,t),0);
+Object.values(P).forEach(p=>{const A=Math.PI*p.D*p.D/4;
+ p.lossM=T.map(t=>p.k*p.L*((Ts[t]-2-Tg)+(42-Tg))/1000);
+ p.dpM=T.map(t=>{const v=mf(p.id,t)/rho/A,Re=v*p.D/3.9e-7,f=.3164/Math.pow(Re,.25);return 2*f*p.L/p.D*rho*v*v/2/1000});
+ p.vM=T.map(t=>mf(p.id,t)/rho/A);
+ p.lossR=clean(raw(p.lossM.map((v,t)=>v*(1+.03*g())*(p.id=='P3'?1+.9*ramp(t,45,8):1))));
+ p.dpR=clean(raw(p.dpM.map((v,t)=>v*(1+.03*g())*(p.id=='P2'?1+.55*ramp(t,55,6):1))));});
+const mean=(a,t,w=6)=>{const s=a.slice(Math.max(0,t-w+1),t+1);return s.reduce((x,y)=>x+y,0)/s.length};
+const sd=(a,t,w=6)=>{const m=mean(a,t,w),s=a.slice(Math.max(0,t-w+1),t+1);return Math.sqrt(s.reduce((x,y)=>x+(y-m)**2,0)/s.length)};
+function diag(t){const o=[];
+ Object.values(C).forEach(c=>{const r=mean(c.TrR,t)-mean(c.TrM,t);
+  if(r>2.5)o.push({k:c.id+'rt',id:c.id,sev:r>6?'crit':'warn',type:'High return temperature',val:'+'+r.toFixed(1)+' K vs. model',act:'Inspect substation heat exchanger and control valve'});
+  if(sd(c.mR,t)<1e-6&&sd(c.mM,t)>.02)o.push({k:c.id+'fl',id:c.id,sev:'warn',type:'Flow sensor flatline',val:'No signal variation for 6 h',act:'Check meter and communication link'});});
+ Object.values(P).forEach(p=>{const l=mean(p.lossR,t)/mean(p.lossM,t),d=mean(p.dpR,t)/mean(p.dpM,t);
+  if(l>1.25)o.push({k:p.id+'ls',id:p.id,sev:l>1.5?'crit':'warn',type:'Excess heat loss',val:'+'+((l-1)*100).toFixed(0)+'% vs. model',act:'Survey insulation, check for wet insulation or leak'});
+  if(d>1.2)o.push({k:p.id+'dp',id:p.id,sev:d>1.4?'crit':'warn',type:'Abnormal pressure drop',val:'+'+((d-1)*100).toFixed(0)+'% vs. model',act:'Check valve positions and fouling'});});
+ return o}
+const A=T.map(diag);
+const hl=t=>'Day '+((t/24|0)+1)+', '+String(t%24).padStart(2,'0')+':00';
+const since=(a,t)=>{let s=t;while(s>0&&A[s-1].some(x=>x.k==a.k))s--;return s};
+let t=71,sel='P3',met=0,timer=null;
+function mser(id,m){const c=C[id],p=P[id];
+ if(c)return m?{n:'Mass flow',u:'kg/s',me:c.mR,mo:c.mM,ab:['Mass flow','Return temperature']}:{n:'Return temperature',u:'°C',me:c.TrR,mo:c.TrM};
+ return m?{n:'Pressure drop',u:'kPa',me:p.dpR,mo:p.dpM}:{n:'Heat loss',u:'kW',me:p.lossR,mo:p.lossM}}
+const tabs=id=>C[id]?['Return temperature','Mass flow']:['Heat loss','Pressure drop'];
+function chart(ser,h){const W=600,m={l:42,r:10,t:8,b:20},all=ser.flatMap(s=>s.d);let lo=Math.min(...all),hi=Math.max(...all);if(lo==hi)hi=lo+1;const pd=(hi-lo)*.12;lo-=pd;hi+=pd;
+ const X=i=>m.l+i*(W-m.l-m.r)/(N-1),Y=v=>h-m.b-(v-lo)/(hi-lo)*(h-m.b-m.t);let s=`<svg viewBox="0 0 ${W} ${h}" role="img">`;
+ for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4;s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" class="gl"/><text x="${m.l-5}" y="${Y(v)+3}" class="ax" text-anchor="end">${v.toFixed(Math.abs(hi)>100?0:1)}</text>`}
+ for(let i=0;i<N;i+=12)s+=`<text x="${X(i)}" y="${h-5}" class="ax" text-anchor="middle">${i}h</text>`;
+ ser.forEach(q=>s+=`<polyline points="${q.d.slice(0,q.cut??N).map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ')}" fill="none" stroke-width="${q.w||1.8}" ${q.dash?'stroke-dasharray="5 4"':''} style="stroke:var(${q.c})"/>`);
+ return s+`<line x1="${X(t)}" x2="${X(t)}" y1="${m.t}" y2="${h-m.b}" class="cur"/></svg>`}
+function render(){
+ const al=A[t],ws=id=>{const a=al.filter(x=>x.id==id);return a.some(x=>x.sev=='crit')?'crit':a.length?'warn':'ok'};
+ const Q=Object.values(C).reduce((s,c)=>s+c.Q[t],0),L=Object.values(P).reduce((s,p)=>s+p.lossR[t],0),Tr=Object.values(C).reduce((s,c)=>s+c.TrR[t],0)/5;
+ const crit=al.filter(x=>x.sev=='crit').length;
+ const k=(a,b,c)=>`<div class="k"><span>${a}</span><strong>${b}</strong><small>${c}</small></div>`;
+ let h='<div class="kpis">'+k('Heat delivered',Q.toFixed(0)+' kW','sum of 5 substations')+k('Trunk heat loss',(L/(Q+L)*100).toFixed(1)+' %',L.toFixed(0)+' kW measured')+k('Supply temperature',Ts[t].toFixed(1)+' °C','outdoor '+To[t].toFixed(1)+' °C')+k('Mean return temperature',Tr.toFixed(1)+' °C','target below 45 °C')+k('Active alerts',al.length,crit+' critical')+'</div>';
+ const S=id=>`s-${ws(id)}`,gs=id=>`class="a ${S(id)}${sel==id?' sel':''}" onclick="pick('${id}')" tabindex="0" onkeydown="if(event.key=='Enter')pick('${id}')"`;
+ const pp=(id,x1,y1,x2,y2,w)=>`<g ${gs(id)}><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="pipe" stroke-width="${sel==id?w+3:w}"/><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="flow"/><rect x="${(x1+x2)/2-27}" y="${(y1+y2)/2-26}" width="54" height="26" rx="5" class="nd" stroke-width="1.5"/><text x="${(x1+x2)/2}" y="${(y1+y2)/2-14}" class="nt" text-anchor="middle">${id}</text><text x="${(x1+x2)/2}" y="${(y1+y2)/2-3}" class="nv" text-anchor="middle">${P[id].lossR[t].toFixed(1)} kW</text></g>`;
+ const sv=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--line)" stroke-width="3"/>`;
+ const cn=(id,x,y)=>`<g ${gs(id)}><rect x="${x-36}" y="${y-18}" width="72" height="36" rx="7" class="nd"/><text x="${x}" y="${y-3}" class="nt" text-anchor="middle">${id}</text><text x="${x}" y="${y+10}" class="nv" text-anchor="middle">${C[id].TrR[t].toFixed(1)} °C</text></g>`;
+ const net=`<svg viewBox="0 0 640 300" role="img" aria-label="Network schematic">${sv(200,150,200,262)}${sv(360,80,505,40)}${sv(360,80,505,120)}${sv(360,220,505,190)}${sv(360,220,505,260)}
+ ${pp('P1',64,150,200,150,8)}${pp('P2',200,150,360,80,6)}${pp('P3',200,150,360,220,6)}
+ <circle cx="200" cy="150" r="5" fill="var(--ink)"/><circle cx="360" cy="80" r="5" fill="var(--ink)"/><circle cx="360" cy="220" r="5" fill="var(--ink)"/>
+ <rect x="14" y="128" width="64" height="44" rx="8" fill="var(--c1)"/><text x="46" y="148" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">Plant</text><text x="46" y="162" text-anchor="middle" fill="#fff" font-size="10">${Ts[t].toFixed(0)} °C</text>
+ ${cn('C1',541,40)}${cn('C2',541,120)}${cn('C3',541,190)}${cn('C4',541,260)}${cn('C5',200,268)}</svg>`;
+ h+=`<div class="g2"><div class="card"><h2>Network status</h2>${net}<div class="lg"><span><i style="border-color:var(--ok)"></i>Within tolerance</span><span><i style="border-color:var(--warn)"></i>Warning</span><span><i style="border-color:var(--crit)"></i>Critical</span></div></div>`;
+ const rows=[...al].sort((a,b)=>(b.sev=='crit')-(a.sev=='crit')).map(a=>`<tr class="r${sel==a.id?' sel':''}" onclick="pick('${a.id}')" tabindex="0" onkeydown="if(event.key=='Enter')pick('${a.id}')"><td><span class="pill ${a.sev}">${a.sev=='crit'?'Critical':'Warning'}</span></td><td><b>${a.id}</b></td><td>${a.type}<br><span class="sub">${a.val} · since ${hl(since(a,t))}</span><br><span class="sub">${a.act}</span></td></tr>`).join('');
+ h+=`<div class="card"><h2>Diagnostics (6 h rolling residuals)</h2>${rows?`<table><tr><th>Level</th><th>Asset</th><th>Finding and action</th></tr>${rows}</table>`:'<span class="pill ok">All assets within tolerance</span><p class="sub">Move the time slider forward to see faults develop.</p>'}</div></div>`;
+ const s=mser(sel,met),cut=t+1,ratio=P[sel]?'':'';
+ const res=s.me.map((v,i)=>v-s.mo[i]);
+ h+=`<div class="card" style="margin-bottom:12px"><h2>${sel} · ${C[sel]?'Substation':'Trunk pipe'} analysis</h2><div class="tabs">${tabs(sel).map((n,i)=>`<button class="${met==i?'on':''}" onclick="met=${i};render()">${n}</button>`).join('')}<span class="sub" style="align-self:center">${C[sel]?'Substation: '+C[sel].Qd+' kW design load':'L = '+P[sel].L+' m · DN'+Math.round(P[sel].D*1000)+' · v = '+P[sel].vM[t].toFixed(2)+' m/s · transport delay '+(P[sel].L/P[sel].vM[t]/60).toFixed(1)+' min'}</span></div>
+ <div class="g2" style="margin:0"><div><div class="lg"><span><i></i>Measured (cleaned)</span><span><i class="d"></i>Model</span><span>${s.n} (${s.u})</span></div>${chart([{d:s.mo,c:'--c2',dash:1},{d:s.me,c:'--c1',cut}],210)}</div>
+ <div><div class="lg"><span>Residual: measured minus model (${s.u})</span></div>${chart([{d:res,c:'--crit',w:1.6,cut}],210)}</div></div></div>`;
+ h+=`<div class="g2"><div class="card"><h2>Data pipeline</h2><div class="pipeline"><div class="st"><b>1 Ingest</b><span>${st.n.toLocaleString()} records</span></div><div class="st"><b>2 Validate</b><span>${st.miss} gaps, ${st.spk} spikes</span></div><div class="st"><b>3 Clean</b><span>${st.fix} values repaired</span></div><div class="st"><b>4 Model</b><span>3 pipes, 5 substations</span></div><div class="st"><b>5 Diagnose</b><span>${N} steps evaluated</span></div></div>
+ <p class="sub">Sensor values pass through gap detection and a rolling-median outlier filter before they are compared with the model.</p></div>
+ <div class="card"><h2>Model basis</h2><pre class="eq">Q = ṁ · cp · (Ts − Tr)            substation balance
+Q_loss = k' · L · (T̄ − T_ground)   pipe heat loss
+t_delay = ρ · A · L / ṁ            transport delay
+Δp = f · (L/D) · ρv²/2             Darcy–Weisbach
+Alert if 6 h mean residual exceeds tolerance</pre></div></div>`;
+ document.getElementById('app').innerHTML=h;document.getElementById('tl').textContent=hl(t);document.getElementById('sl').value=t}
+function pick(id){sel=id;met=0;render()}
+function setT(v){t=v;render()}
+function play(){const b=document.getElementById('pl');if(timer){clearInterval(timer);timer=null;b.textContent='Replay';return}t=0;b.textContent='Pause';timer=setInterval(()=>{if(t>=N-1){clearInterval(timer);timer=null;b.textContent='Replay';return}t++;render()},220)}
+render();
+</script></body></html>
